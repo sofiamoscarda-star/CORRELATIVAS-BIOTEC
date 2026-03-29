@@ -605,3 +605,100 @@ button:not(.text-btn-del):not(.text-btn-add):hover {
         padding: 25px;
     }
 }
+
+/* =========================
+   PESTAÑA MATERIAS DESPLEGABLE
+========================= */
+
+#materias-list {
+    padding: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.materias-year-block {
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.45);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.materias-year-header {
+    background: var(--pink-main);
+    color: var(--white);
+    padding: 16px 20px;
+    font-size: 1.15em;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+}
+
+.materias-year-header:hover {
+    background: var(--pink-dark);
+}
+
+.materias-term-block {
+    border-top: 1px solid rgba(255,255,255,0.5);
+}
+
+.materias-term-header {
+    background: var(--pink-lighter);
+    color: var(--pink-dark);
+    padding: 14px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+}
+
+.materias-term-header:hover {
+    background: #ffb9dc;
+}
+
+.materias-subject-list {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: rgba(255,255,255,0.25);
+}
+
+.subject-card-large {
+    margin: 0;
+    padding: 18px;
+}
+
+.subject-card-large .subject-title {
+    font-size: 1.15em;
+}
+
+.subject-card-large .status-select,
+.subject-card-large .elective-select {
+    font-size: 1em;
+    padding: 8px;
+}
+
+.materias-empty {
+    margin: 0;
+    color: #777;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    #materias-list {
+        padding: 12px;
+    }
+
+    .materias-year-header,
+    .materias-term-header {
+        padding: 14px 16px;
+    }
+
+    .materias-subject-list {
+        padding: 12px;
+    }
+
+    .subject-card-large {
+        padding: 14px;
+    }
+}

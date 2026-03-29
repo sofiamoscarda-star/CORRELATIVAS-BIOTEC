@@ -17,11 +17,6 @@ const db = firebase.firestore();
 // ==========================================
 // 2. BASE DE DATOS DE MATERIAS Y CORRELATIVAS
 // ==========================================
-// reqCourse: requisitos para cursar
-// reqApprove: requisitos para aprobar
-// state "R" = alcanza con regularizada o aprobada
-// state "A" = debe estar aprobada
-
 const reqHasta7mo = [
     "IECQ", "QG_I", "FIS_I", "MAT_I", "LAB_I", "QG_II", "FIS_II", "MAT_II", "LAB_II",
     "QO_I", "QI", "QF", "LAB_III", "QO_II", "QBG", "QAG", "LAB_IV",
@@ -112,6 +107,8 @@ const electivasOptions = {
 let currentUser = null;
 let userData = {};
 let expandedSubjects = {};
+let expandedYears = {};
+let expandedTerms = {};
 
 
 // ==========================================
@@ -222,7 +219,6 @@ function normalizeUserData() {
 
         const locks = checkLockStatus(sub);
 
-        // Si no puede cursarse, se resetea
         if (!locks.canCourse) {
             data.state = 'no_cursada';
             data.finalGrade = null;
@@ -231,7 +227,6 @@ function normalizeUserData() {
             return;
         }
 
-        // Si estaba aprobada pero ya no puede aprobarse, baja a regularizada
         if (data.state === 'aprobada' && !locks.canApprove) {
             data.state = 'regularizada';
         }
@@ -341,7 +336,6 @@ function renderMalla() {
                 subjectsByTerm.forEach(sub => {
                     const data = userData[sub.id] || {};
                     const locks = checkLockStatus(sub);
-
                     let lockClass = !locks.canCourse ? "bloqueada" : "";
 
                     if (data.state === 'aprobada') totalAprobadas++;
@@ -492,37 +486,201 @@ function renderMalla() {
 
 
 // ==========================================
-// 9. RENDER DE OTRAS TABS
+// 9. PESTAÑA MATERIAS DESPLEGABLE
 // ==========================================
+function toggleYear(year) {
+    expandedYears[year] = !expandedYears[year];
+    renderMaterias();
+}
+
+function toggleTerm(year, term) {
+    const key = `${year}-${term}`;
+    expandedTerms[key] = !expandedTerms[key];
+    renderMaterias();
+}
+
 function renderMaterias() {
     const container = document.getElementById('materias-list');
     if (!container) return;
 
-    const materias = subjectsDB
-        .filter(s => !s.isTransversal)
-        .map(sub => {
-            const data = userData[sub.id] || {};
-            const displayName = sub.isElective && data.electiveChoice && data.electiveChoice !== 'default'
-                ? electivasOptions[data.electiveChoice].name
-                : sub.name;
+    let html = '';
+    const years = [1, 2, 3, 4, 5];
 
-            return `
-                <div class="subject-card ${data.state || 'no_cursada'}" style="margin: 10px 20px;">
-                    <div class="subject-header">
-                        <span class="subject-title">${displayName}</span>
-                        <span class="status-dot dot-${data.state || 'no_cursada'}"></span>
-                    </div>
-                    <div style="margin-top: 8px;">Año ${sub.year} - Cuatrimestre ${sub.term}</div>
-                    <div style="margin-top: 6px;">Estado: ${formatState(data.state || 'no_cursada')}</div>
-                    ${data.finalGrade !== null ? `<div style="margin-top: 6px;">Nota final: ${data.finalGrade}</div>` : ''}
+    years.forEach(year => {
+        const isYearOpen = !!expandedYears[year];
+
+        html += `
+            <div class="materias-year-block">
+                <div class="materias-year-header" onclick="toggleYear(${year})">
+                    <span>${isYearOpen ? '▼' : '▶'} Año ${year}</span>
                 </div>
-            `;
-        })
-        .join('');
+        `;
 
-    container.innerHTML = materias || '<p style="padding:20px;">No hay materias para mostrar.</p>';
+        if (isYearOpen) {
+            [1, 2].forEach(term => {
+                const key = `${year}-${term}`;
+                const isTermOpen = !!expandedTerms[key];
+
+                let subjectsByTerm = subjectsDB.filter(
+                    s => !s.isTransversal && s.year === year && s.term === term
+                );
+
+                const placedTransversales = subjectsDB.filter(
+                    s => s.isTransversal &&
+                    userData[s.id] &&
+                    userData[s.id].placedYear === year &&
+                    userData[s.id].placedTerm === term
+                );
+
+                subjectsByTerm = subjectsByTerm.concat(placedTransversales);
+
+                html += `
+                    <div class="materias-term-block">
+                        <div class="materias-term-header" onclick="toggleTerm(${year}, ${term})">
+                            <span>${isTermOpen ? '▼' : '▶'} Cuatrimestre ${term}</span>
+                        </div>
+                `;
+
+                if (isTermOpen) {
+                    html += `<div class="materias-subject-list">`;
+
+                    if (subjectsByTerm.length === 0) {
+                        html += `<p class="materias-empty">No hay materias en este cuatrimestre.</p>`;
+                    } else {
+                        subjectsByTerm.forEach(sub => {
+                            const data = userData[sub.id] || {};
+                            const locks = checkLockStatus(sub);
+                            let lockClass = !locks.canCourse ? 'bloqueada' : '';
+
+                            let gradeHtml = (data.finalGrade !== null && data.state === 'aprobada')
+                                ? `<span class="subject-grade">(Nota: ${data.finalGrade})</span>`
+                                : '';
+
+                            let displayName = sub.name;
+                            let electiveHtml = '';
+
+                            if (sub.isElective) {
+                                const currentChoice = data.electiveChoice || 'default';
+
+                                electiveHtml = `<select class="status-select elective-select" onchange="changeElective('${sub.id}', this.value)">`;
+                                for (const [keyOpt, valueOpt] of Object.entries(electivasOptions)) {
+                                    electiveHtml += `<option value="${keyOpt}" ${currentChoice === keyOpt ? 'selected' : ''}>${valueOpt.name}</option>`;
+                                }
+                                electiveHtml += `</select>`;
+
+                                if (currentChoice !== 'default') {
+                                    displayName = electivasOptions[currentChoice].name;
+                                }
+                            }
+
+                            let informeHtml = '';
+                            if (locks.canCourse) {
+                                const isExpanded = expandedSubjects[sub.id];
+
+                                let examsHtml = (data.exams || []).map((exam, i) => `
+                                    <div class="eval-item">
+                                        <div class="panel-row">
+                                            <select onchange="updateItem('${sub.id}', 'exams', ${i}, 'type', this.value)">
+                                                <option value="1er parcial" ${exam.type==='1er parcial'?'selected':''}>1er parcial</option>
+                                                <option value="2do parcial" ${exam.type==='2do parcial'?'selected':''}>2do parcial</option>
+                                                <option value="Recup. 1er parcial" ${exam.type==='Recup. 1er parcial'?'selected':''}>Recup. 1</option>
+                                                <option value="Recup. 2do parcial" ${exam.type==='Recup. 2do parcial'?'selected':''}>Recup. 2</option>
+                                                <option value="Examen Final" ${exam.type==='Examen Final'?'selected':''}>Examen Final</option>
+                                            </select>
+                                            <input type="number" class="nota-input" placeholder="Nota" value="${exam.grade ?? ''}" onchange="updateItem('${sub.id}', 'exams', ${i}, 'grade', this.value)">
+                                            <button class="text-btn-del" onclick="removeItem('${sub.id}', 'exams', ${i})" title="Borrar">X</button>
+                                        </div>
+                                        <input type="text" class="tema-input" placeholder="Escribir temas aquí..." value="${exam.topic || ''}" onchange="updateItem('${sub.id}', 'exams', ${i}, 'topic', this.value)">
+                                    </div>
+                                `).join('');
+
+                                let worksHtml = (data.works || []).map((work, i) => `
+                                    <div class="eval-item">
+                                        <div class="panel-row">
+                                            <input type="text" placeholder="Nombre" value="${work.name || ''}" onchange="updateItem('${sub.id}', 'works', ${i}, 'name', this.value)" style="flex:1; min-width:0;">
+                                            <input type="number" class="nota-input" placeholder="Nota" value="${work.grade ?? ''}" onchange="updateItem('${sub.id}', 'works', ${i}, 'grade', this.value)">
+                                            <button class="text-btn-del" onclick="removeItem('${sub.id}', 'works', ${i})" title="Borrar">X</button>
+                                        </div>
+                                        <input type="text" class="tema-input" placeholder="Escribir temas aquí..." value="${work.topic || ''}" onchange="updateItem('${sub.id}', 'works', ${i}, 'topic', this.value)">
+                                    </div>
+                                `).join('');
+
+                                informeHtml = `
+                                    <div class="informe-toggle" onclick="toggleInforme('${sub.id}')">
+                                        ${isExpanded ? '▼ Ocultar Informe' : '▶ Informe de Materia'}
+                                    </div>
+
+                                    <div class="informe-panel" style="display: ${isExpanded ? 'block' : 'none'};">
+                                        <h4>Datos de Exámenes</h4>
+                                        ${examsHtml}
+                                        <button class="text-btn-add" onclick="addItem('${sub.id}', 'exams')">
+                                            <span class="plus-icon">+</span> Agregar Examen
+                                        </button>
+
+                                        <h4 style="margin-top:10px;">Trabajos con Nota</h4>
+                                        ${worksHtml}
+                                        <button class="text-btn-add" onclick="addItem('${sub.id}', 'works')">
+                                            <span class="plus-icon">+</span> Agregar Trabajo
+                                        </button>
+
+                                        <div class="pesos-config">
+                                            <label>Exámenes:
+                                                <input type="number" value="${data.examsWeight ?? 70}" onchange="updateWeight('${sub.id}', 'examsWeight', this.value)">%
+                                            </label>
+                                            <label>Trabajos:
+                                                <input type="number" value="${data.worksWeight ?? 30}" onchange="updateWeight('${sub.id}', 'worksWeight', this.value)">%
+                                            </label>
+                                        </div>
+                                    </div>
+                                `;
+                            }
+
+                            html += `
+                                <div class="subject-card subject-card-large ${data.state || 'no_cursada'} ${lockClass}">
+                                    <div class="subject-header">
+                                        <span class="subject-title">${displayName}</span>
+                                        <div class="subject-actions">
+                                            ${sub.isTransversal ? `<button class="text-btn-del" onclick="removeTransversal('${sub.id}')" title="Quitar transversal">✖</button>` : ''}
+                                            <span class="status-dot dot-${data.state || 'no_cursada'}"></span>
+                                        </div>
+                                    </div>
+
+                                    ${gradeHtml}
+                                    ${electiveHtml}
+
+                                    <select class="status-select" onchange="changeState('${sub.id}', this.value)" ${!locks.canCourse ? 'disabled' : ''}>
+                                        <option value="no_cursada" ${data.state === 'no_cursada' ? 'selected' : ''}>No Cursada</option>
+                                        <option value="en_curso" ${data.state === 'en_curso' ? 'selected' : ''}>En Curso</option>
+                                        <option value="regularizada" ${data.state === 'regularizada' ? 'selected' : ''}>Regularizada</option>
+                                        ${locks.canApprove
+                                            ? `<option value="aprobada" ${data.state === 'aprobada' ? 'selected' : ''}>Aprobada</option>`
+                                            : `<option disabled>Aprobada (Faltan Correlativas)</option>`
+                                        }
+                                    </select>
+
+                                    ${informeHtml}
+                                </div>
+                            `;
+                        });
+                    }
+
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            });
+        }
+
+        html += `</div>`;
+    });
+
+    container.innerHTML = html;
 }
 
+
+// ==========================================
+// 10. PROMEDIOS
+// ==========================================
 function renderPromedios() {
     const tbody = document.querySelector('#tabla-promedios tbody');
     const promedioEl = document.getElementById('promedio-general-val');
@@ -563,19 +721,9 @@ function renderPromedios() {
     promedioEl.textContent = promedio;
 }
 
-function formatState(state) {
-    switch (state) {
-        case 'no_cursada': return 'No cursada';
-        case 'en_curso': return 'En curso';
-        case 'regularizada': return 'Regularizada';
-        case 'aprobada': return 'Aprobada';
-        default: return state;
-    }
-}
-
 
 // ==========================================
-// 10. INFORME DE MATERIA
+// 11. INFORME DE MATERIA
 // ==========================================
 function toggleInforme(subjId) {
     expandedSubjects[subjId] = !expandedSubjects[subjId];
@@ -621,7 +769,7 @@ function saveAndRender(subjId) {
 
 
 // ==========================================
-// 11. CAMBIO DE ESTADO / ELECTIVAS / TRANSVERSALES
+// 12. CAMBIO DE ESTADO / ELECTIVAS / TRANSVERSALES
 // ==========================================
 function changeState(subjId, newState) {
     if (!userData[subjId]) return;
@@ -671,7 +819,7 @@ function removeTransversal(subjId) {
 
 
 // ==========================================
-// 12. NAVEGACIÓN
+// 13. NAVEGACIÓN
 // ==========================================
 function switchTab(tabId, event) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
@@ -683,7 +831,7 @@ function switchTab(tabId, event) {
 
 
 // ==========================================
-// 13. LOGIN Y FIREBASE
+// 14. LOGIN Y FIREBASE
 // ==========================================
 async function login() {
     const user = document.getElementById('username-input').value.trim();
@@ -734,7 +882,7 @@ async function saveToFirebase() {
 
 
 // ==========================================
-// 14. INICIALIZACIÓN
+// 15. INICIALIZACIÓN
 // ==========================================
 window.onload = () => {
     validateSubjectsDB();
