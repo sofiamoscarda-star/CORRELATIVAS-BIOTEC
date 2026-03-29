@@ -13,6 +13,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+
 // ==========================================
 // 2. BASE DE DATOS DE MATERIAS Y CORRELATIVAS
 // ==========================================
@@ -30,6 +31,7 @@ const reqHasta7mo = [
 ].map(id => ({ id: id, state: "A" }));
 
 const subjectsDB = [
+    // --- PRIMER AÑO ---
     { id: "IECQ", name: "Introducción a las Cs. Químicas", year: 1, term: 1, reqCourse: [], reqApprove: [] },
     { id: "QG_I", name: "Química General I", year: 1, term: 1, reqCourse: [{id:"IECQ", state:"R"}], reqApprove: [{id:"IECQ", state:"A"}] },
     { id: "FIS_I", name: "Física I", year: 1, term: 1, reqCourse: [{id:"IECQ", state:"R"}], reqApprove: [{id:"IECQ", state:"A"}] },
@@ -41,6 +43,7 @@ const subjectsDB = [
     { id: "MAT_II", name: "Matemática II", year: 1, term: 2, reqCourse: [{id:"IECQ", state:"A"}, {id:"MAT_I", state:"R"}], reqApprove: [{id:"IECQ", state:"A"}, {id:"MAT_I", state:"A"}] },
     { id: "LAB_II", name: "Laboratorio II", year: 1, term: 2, reqCourse: [{id:"IECQ", state:"A"}, {id:"LAB_I", state:"R"}], reqApprove: [{id:"IECQ", state:"A"}, {id:"LAB_I", state:"A"}] },
 
+    // --- SEGUNDO AÑO ---
     { id: "QO_I", name: "Química Orgánica I", year: 2, term: 1, reqCourse: [{id:"QG_I", state:"R"}, {id:"QG_II", state:"R"}], reqApprove: [{id:"QG_I", state:"A"}, {id:"QG_II", state:"A"}] },
     { id: "QI", name: "Química Inorgánica", year: 2, term: 1, reqCourse: [{id:"QG_I", state:"R"}, {id:"QG_II", state:"R"}], reqApprove: [{id:"QG_I", state:"A"}, {id:"QG_II", state:"A"}] },
     { id: "QF", name: "Química Física", year: 2, term: 1, reqCourse: [{id:"QG_I", state:"A"}, {id:"QG_II", state:"R"}, {id:"FIS_II", state:"R"}, {id:"MAT_II", state:"R"}], reqApprove: [{id:"QG_I", state:"A"}, {id:"QG_II", state:"A"}, {id:"FIS_II", state:"A"}, {id:"MAT_II", state:"A"}] },
@@ -51,6 +54,7 @@ const subjectsDB = [
     { id: "QAG", name: "Química Analítica General", year: 2, term: 2, reqCourse: [{id:"QI", state:"R"}, {id:"LAB_III", state:"R"}, {id:"QG_I", state:"A"}, {id:"QF", state:"R"}], reqApprove: [{id:"QI", state:"A"}, {id:"LAB_III", state:"A"}, {id:"QG_II", state:"A"}, {id:"QF", state:"A"}] },
     { id: "LAB_IV", name: "Laboratorio IV", year: 2, term: 2, reqCourse: [{id:"QO_I", state:"R"}, {id:"LAB_II", state:"A"}, {id:"LAB_III", state:"R"}], reqApprove: [{id:"QO_I", state:"A"}, {id:"LAB_II", state:"A"}, {id:"LAB_III", state:"A"}] },
 
+    // --- TERCER AÑO ---
     { id: "BCyM", name: "Biología Celular y Molecular", year: 3, term: 1, reqCourse: [{id:"QO_II", state:"R"}, {id:"QBG", state:"R"}, {id:"QO_I", state:"A"}], reqApprove: [{id:"QO_I", state:"A"}, {id:"QBG", state:"A"}, {id:"QO_II", state:"A"}] },
     { id: "GENETICA", name: "Genética", year: 3, term: 1, reqCourse: [], reqApprove: [{id:"BCyM", state:"A"}] },
     { id: "MICROBIO", name: "Microbiología", year: 3, term: 1, reqCourse: [{id:"QBG", state:"R"}], reqApprove: [{id:"QBG", state:"A"}] },
@@ -63,6 +67,7 @@ const subjectsDB = [
     { id: "HIG_SEG", name: "Higiene y Seguridad Laboral", year: 3, term: 2, reqCourse: [{id:"BCyM", state:"R"}, {id:"QO_II", state:"A"}], reqApprove: [{id:"BCyM", state:"A"}, {id:"QO_II", state:"A"}] },
     { id: "BIOMAT", name: "Biomateriales", year: 3, term: 2, reqCourse: [{id:"QF", state:"A"}, {id:"QO_II", state:"A"}, {id:"QBG", state:"A"}, {id:"BIOTEC", state:"R"}, {id:"MICROBIO", state:"A"}, {id:"BCyM", state:"A"}], reqApprove: [{id:"QF", state:"A"}, {id:"QO_II", state:"A"}, {id:"QBG", state:"A"}, {id:"BIOTEC", state:"A"}, {id:"MICROBIO", state:"A"}, {id:"BCyM", state:"A"}] },
 
+    // --- CUARTO AÑO ---
     { id: "BIOFIS_Q", name: "Biofísica Química", year: 4, term: 1, reqCourse: [{id:"QF", state:"A"}, {id:"QO_II", state:"A"}, {id:"QBG", state:"A"}], reqApprove: [{id:"QF", state:"A"}, {id:"QO_II", state:"A"}, {id:"QBG", state:"A"}] },
     { id: "PROT_REC", name: "Proteínas Recombinantes", year: 4, term: 1, reqCourse: [{id:"BIOTEC", state:"R"}, {id:"MICROBIO", state:"A"}], reqApprove: [{id:"BIOTEC", state:"A"}, {id:"MICROBIO", state:"A"}] },
     { id: "PROC_BIOTEC_I", name: "Procesos Biotecnológicos I", year: 4, term: 1, reqCourse: [{id:"BCyM", state:"A"}], reqApprove: [{id:"BCyM", state:"A"}] },
@@ -75,6 +80,7 @@ const subjectsDB = [
     { id: "BIOTEC_VEG", name: "Biotecnología Vegetal", year: 4, term: 2, reqCourse: [{id:"FFVA", state:"R"}, {id:"BCyM", state:"A"}], reqApprove: [{id:"FFVA", state:"A"}, {id:"BCyM", state:"A"}] },
     { id: "ETICA", name: "Ética y Legislación", year: 4, term: 2, reqCourse: [{id:"BIOTEC", state:"A"}], reqApprove: [{id:"BIOTEC", state:"A"}] },
 
+    // --- QUINTO AÑO ---
     { id: "PROY_PLANTAS", name: "Proyectos en Plantas Biotec.", year: 5, term: 1, reqCourse: [{id:"PROC_BIOTEC_I", state:"A"}, {id:"PROC_BIOTEC_II", state:"R"}], reqApprove: [{id:"PROC_BIOTEC_I", state:"A"}, {id:"PROC_BIOTEC_II", state:"A"}] },
     { id: "ECON_GEST", name: "Economía y Gestión", year: 5, term: 1, reqCourse: [{id:"HIG_SEG", state:"A"}, {id:"ETICA", state:"R"}], reqApprove: [{id:"HIG_SEG", state:"A"}, {id:"ETICA", state:"A"}] },
     { id: "FARMACOS", name: "Fármacos Biotecnológicos", year: 5, term: 1, reqCourse: [{id:"FFVA", state:"A"}, {id:"NANO_BIOTEC", state:"A"}], reqApprove: [{id:"FFVA", state:"A"}, {id:"NANO_BIOTEC", state:"A"}] },
@@ -84,6 +90,7 @@ const subjectsDB = [
     { id: "ELEC_2", name: "Asignatura Electiva II", year: 5, term: 2, isElective: true, reqCourse: [], reqApprove: [] },
     { id: "PRACT_PROF", name: "Practicanato Profesional", year: 5, term: 2, reqCourse: [...reqHasta7mo, {id:"PRACT_PREP", state:"R"}], reqApprove: [] },
 
+    // --- TRANSVERSALES ---
     { id: "INGLES", name: "Inglés", isTransversal: true, reqCourse: [], reqApprove: [] },
     { id: "INFO", name: "Informática", isTransversal: true, reqCourse: [], reqApprove: [] }
 ];
@@ -98,12 +105,14 @@ const electivasOptions = {
     "bioinorganica": { name: "Química Bioinorgánica", reqCourse: [{id:"QI",state:"A"}, {id:"QBG",state:"A"}], reqApprove: [{id:"QI",state:"A"}, {id:"QBG",state:"A"}] }
 };
 
+
 // ==========================================
 // 3. ESTADO GLOBAL
 // ==========================================
 let currentUser = null;
 let userData = {};
 let expandedSubjects = {};
+
 
 // ==========================================
 // 4. UTILIDADES
@@ -140,7 +149,6 @@ function resetSubject(subjId) {
 
 function validateSubjectsDB() {
     const ids = new Set(subjectsDB.map(s => s.id));
-
     subjectsDB.forEach(subject => {
         [...subject.reqCourse, ...subject.reqApprove].forEach(req => {
             if (!ids.has(req.id)) {
@@ -149,6 +157,7 @@ function validateSubjectsDB() {
         });
     });
 }
+
 
 // ==========================================
 // 5. CORRELATIVIDADES
@@ -202,8 +211,38 @@ function checkLockStatus(subject) {
     return { canCourse, canApprove };
 }
 
+
 // ==========================================
-// 6. CÁLCULO DE NOTAS
+// 6. NORMALIZACIÓN / BARRIDO DE ESTADOS
+// ==========================================
+function normalizeUserData() {
+    subjectsDB.forEach(sub => {
+        const data = userData[sub.id];
+        if (!data) return;
+
+        const locks = checkLockStatus(sub);
+
+        // Si no puede cursarse, se resetea
+        if (!locks.canCourse) {
+            data.state = 'no_cursada';
+            data.finalGrade = null;
+            data.exams = [];
+            data.works = [];
+            return;
+        }
+
+        // Si estaba aprobada pero ya no puede aprobarse, baja a regularizada
+        if (data.state === 'aprobada' && !locks.canApprove) {
+            data.state = 'regularizada';
+        }
+
+        calculateGrades(sub.id);
+    });
+}
+
+
+// ==========================================
+// 7. CÁLCULO DE NOTAS
 // ==========================================
 function calculateGrades(subjId) {
     const data = userData[subjId];
@@ -256,8 +295,9 @@ function calculateGrades(subjId) {
     }
 }
 
+
 // ==========================================
-// 7. RENDER PRINCIPAL
+// 8. RENDER PRINCIPAL
 // ==========================================
 function renderMalla() {
     const grid = document.getElementById('malla-grid');
@@ -279,6 +319,7 @@ function renderMalla() {
 
         terms.forEach(term => {
             let subjectsByTerm = subjectsDB.filter(s => !s.isTransversal && s.year === year && s.term === term);
+
             const placedTransversales = subjectsDB.filter(
                 s => s.isTransversal &&
                 userData[s.id] &&
@@ -449,8 +490,9 @@ function renderMalla() {
     renderPromedios();
 }
 
+
 // ==========================================
-// 8. RENDER DE OTRAS TABS
+// 9. RENDER DE OTRAS TABS
 // ==========================================
 function renderMaterias() {
     const container = document.getElementById('materias-list');
@@ -460,10 +502,14 @@ function renderMaterias() {
         .filter(s => !s.isTransversal)
         .map(sub => {
             const data = userData[sub.id] || {};
+            const displayName = sub.isElective && data.electiveChoice && data.electiveChoice !== 'default'
+                ? electivasOptions[data.electiveChoice].name
+                : sub.name;
+
             return `
                 <div class="subject-card ${data.state || 'no_cursada'}" style="margin: 10px 20px;">
                     <div class="subject-header">
-                        <span class="subject-title">${sub.name}</span>
+                        <span class="subject-title">${displayName}</span>
                         <span class="status-dot dot-${data.state || 'no_cursada'}"></span>
                     </div>
                     <div style="margin-top: 8px;">Año ${sub.year} - Cuatrimestre ${sub.term}</div>
@@ -497,11 +543,16 @@ function renderPromedios() {
 
     approvedWithGrade.forEach(sub => {
         const grade = userData[sub.id].finalGrade;
+        const data = userData[sub.id];
+        const displayName = sub.isElective && data.electiveChoice && data.electiveChoice !== 'default'
+            ? electivasOptions[data.electiveChoice].name
+            : sub.name;
+
         sum += grade;
 
         tbody.innerHTML += `
             <tr>
-                <td>${sub.name}</td>
+                <td>${displayName}</td>
                 <td>${sub.year ?? '-'}</td>
                 <td>${grade}</td>
             </tr>
@@ -522,8 +573,9 @@ function formatState(state) {
     }
 }
 
+
 // ==========================================
-// 9. INFORME DE MATERIA
+// 10. INFORME DE MATERIA
 // ==========================================
 function toggleInforme(subjId) {
     expandedSubjects[subjId] = !expandedSubjects[subjId];
@@ -562,12 +614,14 @@ function updateWeight(subjId, field, val) {
 
 function saveAndRender(subjId) {
     calculateGrades(subjId);
+    normalizeUserData();
     saveToFirebase();
     renderMalla();
 }
 
+
 // ==========================================
-// 10. CAMBIO DE ESTADO / ELECTIVAS / TRANSVERSALES
+// 11. CAMBIO DE ESTADO / ELECTIVAS / TRANSVERSALES
 // ==========================================
 function changeState(subjId, newState) {
     if (!userData[subjId]) return;
@@ -581,6 +635,7 @@ function changeState(subjId, newState) {
     }
 
     calculateGrades(subjId);
+    normalizeUserData();
     saveToFirebase();
     renderMalla();
 }
@@ -590,6 +645,7 @@ function changeElective(subjId, choice) {
 
     userData[subjId].electiveChoice = choice;
     resetSubject(subjId);
+    normalizeUserData();
     saveToFirebase();
     renderMalla();
 }
@@ -613,8 +669,9 @@ function removeTransversal(subjId) {
     changeState(subjId, 'no_cursada');
 }
 
+
 // ==========================================
-// 11. NAVEGACIÓN
+// 12. NAVEGACIÓN
 // ==========================================
 function switchTab(tabId, event) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
@@ -624,8 +681,9 @@ function switchTab(tabId, event) {
     event.target.classList.add('active');
 }
 
+
 // ==========================================
-// 12. LOGIN Y FIREBASE
+// 13. LOGIN Y FIREBASE
 // ==========================================
 async function login() {
     const user = document.getElementById('username-input').value.trim();
@@ -638,9 +696,6 @@ async function login() {
     currentUser = user;
 
     document.getElementById('login-screen').classList.remove('active');
-    document.getElementById('main-nav').classList.remove('hidden');
-    document.getElementById('app-container').classList.remove('hidden');
-    document.getElementById('progress-footer').classList.remove('hidden');
 
     try {
         const doc = await db.collection("users").doc(currentUser).get();
@@ -659,6 +714,7 @@ async function login() {
             userData = initUserData();
         }
 
+        normalizeUserData();
         renderMalla();
     } catch (error) {
         console.error("Error al cargar datos:", error);
@@ -676,8 +732,9 @@ async function saveToFirebase() {
     }
 }
 
+
 // ==========================================
-// 13. INICIALIZACIÓN
+// 14. INICIALIZACIÓN
 // ==========================================
 window.onload = () => {
     validateSubjectsDB();
