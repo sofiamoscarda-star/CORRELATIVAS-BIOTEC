@@ -12,8 +12,13 @@
     <div id="login-screen" class="modal active">
         <div class="modal-content">
             <h2>Sincronización de Datos</h2>
-            <p>Ingresa tu usuario para sincronizar con tu celular/PC.</p>
-            <input type="text" id="username-input" placeholder="Ej: Franco123">
+            <p>Usá siempre el mismo nombre para ver tu progreso en celular, PC o tablet.</p>
+            <input 
+                type="text" 
+                id="username-input" 
+                placeholder="Tu usuario o clave"
+                onkeydown="if(event.key === 'Enter') login()"
+            >
             <button onclick="login()">Ingresar</button>
         </div>
     </div>
@@ -21,28 +26,26 @@
     <nav id="main-nav">
         <h1>BIOTECNOLOGÍA</h1>
         <div class="tabs">
-            <button onclick="switchTab('correlatividades')" class="active">Correlatividades</button>
-            <button onclick="switchTab('materias')">Materias</button>
-            <button onclick="switchTab('promedios')">Promedio General</button>
+            <button onclick="switchTab('correlatividades', event)" class="active">Correlatividades</button>
+            <button onclick="switchTab('materias', event)">Materias</button>
+            <button onclick="switchTab('promedios', event)">Promedio General</button>
         </div>
     </nav>
 
     <main id="app-container">
-        
-        <section id="tab-correlatividades" class="tab-content active">
-            <div id="malla-grid" class="malla-grid">
-                </div>
+        <section id="tab-correlatividades" class="tab-content">
+            <div id="malla-grid" class="malla-grid"></div>
         </section>
 
-        <section id="tab-materias" class="tab-content">
-            <div id="materias-list">
-                </div>
+        <section id="tab-materias" class="tab-content hidden">
+            <div id="materias-list"></div>
         </section>
 
-        <section id="tab-promedios" class="tab-content">
+        <section id="tab-promedios" class="tab-content hidden">
             <div class="promedio-card">
                 <h2>Promedio General: <span id="promedio-general-val">-</span></h2>
             </div>
+
             <table id="tabla-promedios">
                 <thead>
                     <tr>
@@ -51,49 +54,17 @@
                         <th>Nota Final</th>
                     </tr>
                 </thead>
-                <tbody>
-                    </tbody>
+                <tbody></tbody>
             </table>
         </section>
-
     </main>
 
     <footer id="progress-footer">
-        <div class="progress-container">
-            <div id="progress-bar" class="progress-bar"></div>
+        <div id="progress-text">Progreso: 0%</div>
+        <div class="progress-bar-bg">
+            <div id="progress-bar"></div>
         </div>
-        <p>Progreso: <span id="progress-text">0%</span></p>
     </footer>
-
-    <div id="informe-modal" class="modal">
-        <div class="modal-content informe-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title">Nombre Materia</h2>
-            <h3 class="nota-destacada">Nota Final: <span id="modal-nota-final">-</span></h3>
-
-            <div class="informe-grid">
-                <div class="informe-section">
-                    <h3>Datos de Exámenes</h3>
-                    <div id="examenes-list"></div>
-                    <button onclick="addExamen()">+ Agregar Examen</button>
-                </div>
-
-                <div class="informe-section">
-                    <h3>Trabajos con Nota</h3>
-                    <div id="trabajos-list"></div>
-                    <button onclick="addTrabajo()">+ Agregar Trabajo</button>
-                </div>
-            </div>
-            
-            <div class="config-porcentajes">
-                <h3>Porcentajes (Suman 100%)</h3>
-                <label>Exámenes (%): <input type="number" id="peso-examenes" value="70"></label>
-                <label>Trabajos (%): <input type="number" id="peso-trabajos" value="30"></label>
-            </div>
-
-            <button class="save-btn" onclick="saveInforme()">Guardar Cambios</button>
-        </div>
-    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
