@@ -11,7 +11,8 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 
 // ==========================================
@@ -440,3 +441,12 @@ function saveToFirebase() {
         db.collection("users").doc(currentUser).set(userData);
     }
 }
+
+// ==========================================
+// 8. INICIALIZACIÓN VISUAL (FONDO DEL LOGIN)
+// ==========================================
+window.onload = () => {
+    // Carga un molde vacío solo para que se vea estéticamente de fondo
+    userData = initUserData();
+    renderMalla();
+};

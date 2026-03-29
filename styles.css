@@ -15,10 +15,10 @@
     --year5: #ffb3d9;
 
     /* Estados */
-    --dot-aprobada: #4caf50;
-    --dot-regular: #ffeb3b;
-    --dot-curso: #9e9e9e;
-    --dot-bloqueada: #e0e0e0;
+    --dot-aprobada: #86c488;
+    --dot-regular: #f2e783;
+    --dot-curso: #c4bec1;
+    --dot-bloqueada: #e1b9c4;
 }
 
 body {
