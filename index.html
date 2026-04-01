@@ -13,18 +13,24 @@
         <div class="modal-content">
             <h2>Sincronización de Datos</h2>
             <p>Usá siempre el mismo nombre para ver tu progreso en celular, PC o tablet.</p>
-            <input 
-                type="text" 
-                id="username-input" 
-                placeholder="Tu usuario o clave"
-                onkeydown="if(event.key === 'Enter') login()"
-            >
+            <input type="text" id="username-input" placeholder="Tu usuario o clave" onkeydown="if(event.key === 'Enter') login()">
             <button onclick="login()">Ingresar</button>
         </div>
     </div>
 
+    <div id="info-modal" class="modal">
+        <div class="modal-content info-bloqueada-content">
+            <h2 id="info-modal-title">Nombre de Materia</h2>
+            <div id="info-modal-body" class="modal-body-text"></div>
+            <button onclick="cerrarModalInfo()">Entendido</button>
+        </div>
+    </div>
+
     <nav id="main-nav">
-        <h1>BIOTECNOLOGÍA</h1>
+        <div class="nav-brand">
+            <div class="nav-subtitle">Licenciatura en</div>
+            <h1>Biotecnología</h1>
+        </div>
         <div class="tabs">
             <button onclick="switchTab('correlatividades', event)" class="active">Correlatividades</button>
             <button onclick="switchTab('materias', event)">Materias</button>
@@ -38,24 +44,27 @@
         </section>
 
         <section id="tab-materias" class="tab-content hidden">
+            <div id="materias-stats" class="materias-stats-bar"></div>
+            
+            <div class="materias-search-wrap">
+                <input type="text" id="materias-search" placeholder="Buscar materia..." oninput="renderMaterias()">
+            </div>
             <div id="materias-list"></div>
         </section>
 
         <section id="tab-promedios" class="tab-content hidden">
-            <div class="promedio-card">
-                <h2>Promedio General: <span id="promedio-general-val">-</span></h2>
+            <div class="promedios-excel-wrap">
+                <table id="tabla-promedios-excel">
+                    <thead>
+                        <tr><th colspan="8" class="titulo-tabla-promedios"></th></tr>
+                        <tr>
+                            <th>AÑO</th><th>CUATRIMESTRE</th><th>MATERIAS</th><th>NOTAS</th>
+                            <th>PROMEDIO CUATRIMESTRE</th><th>PROMEDIO AÑO</th><th>PROMEDIO GENERAL</th><th>FÓRMULA</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
-
-            <table id="tabla-promedios">
-                <thead>
-                    <tr>
-                        <th>Materia</th>
-                        <th>Año</th>
-                        <th>Nota Final</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
         </section>
     </main>
 
